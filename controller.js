@@ -172,7 +172,7 @@ module.exports = (function() {
 		    // and the crypto store (where the users' keys are kept)
 		    var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
 		    crypto_suite.setCryptoKeyStore(crypto_store);
-		    fabric_client.setCryptoSuite(cryptoaddStudent_suite);
+		    fabric_client.setCryptoSuite(crypto_suite);
 
 		    // get the enrolled user from persistence, this user will sign all requests
 		    return fabric_client.getUserContext('user1', true);
@@ -198,7 +198,7 @@ module.exports = (function() {
 		    console.log("Query has completed, checking results");
 		    // query_responses could have more than one  results if there multiple peers were used as targets
 		    if (query_responses && query_responses.length == 1) {
-		        if (query_responses[0] instanceof addStudentError) {
+		        if (query_responses[0] instanceof Error) {
 		            console.error("error from query = ", query_responses[0]);
 		            res.send("Could not locate student")
 		            
