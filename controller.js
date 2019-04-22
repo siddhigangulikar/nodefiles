@@ -9,6 +9,8 @@ var Fabric_Client = require('fabric-client');
 var path          = require('path');
 var util          = require('util');
 var os            = require('os');
+
+app.use(bodyParser.urlencoded({extended:true}));
 module.exports = (function() {
 	return{
 		get_all_cert: function(req, res){
@@ -145,7 +147,7 @@ module.exports = (function() {
 		    res.send("Could not locate cert")
 		});
 	},
-		get_student: function(req, res){
+	get_student: function(req, res){
 
 		var fabric_client = new Fabric_Client();
 		var key = req.params.id
@@ -155,7 +157,7 @@ module.exports = (function() {
 		var peer = fabric_client.newPeer('grpc://localhost:7051');
 		channel.addPeer(peer);
 
-		//
+		
 		var member_user = null;
 		var store_path = path.join(os.homedir(), '.hfc-key-store');
 		console.log('Store path:'+store_path);
@@ -184,7 +186,7 @@ module.exports = (function() {
 				throw new Error('Failed to get user1.... run registerUser.js');
 		    }
 
-		    // readCert - requires 1 argument, ex: args: ['4'],
+		    // getStudent - requires 1 argument, ex: args: ['4']
 		    const request = {
 		        chaincodeId: 'securecert-app',
 		        txId: tx_id,
@@ -226,6 +228,7 @@ module.exports = (function() {
 	    var examination = req.body['cert_examination']
 	    var YOP = req.body['cert_YOP']
 	    var sub = req.body['cert_sububject']
+	
 
 
 		var fabric_client = new Fabric_Client();
@@ -316,7 +319,7 @@ module.exports = (function() {
 		        // get an eventhub once the fabric client has a user assigned. The user
 		        // is required bacause the event registration must be signed
 		        let event_hub = fabric_client.newEventHub();
-		        event_hub.setPeerAddr('grpc://localhost:7053');
+		        event_hub.setPeerAddr('grpcs://localhost:7053');
 
 		        // using resolve the promise so that result status may be processed
 		        // under the then clause rather than having the catch clause process
@@ -344,7 +347,7 @@ module.exports = (function() {
 		                    resolve(return_status);
 		                }
 		            }, (err) => {
-		                //this is the callback if something goes wrong with thhttp://localhost:8000/get_student/123http://localhost:8000/get_student/123http://localhost:8000/get_student/123e event registration or processing
+		                //this is the callback if something goes wrong with the event registration or processing
 		                reject(new Error('There was a problem with the eventhub ::'+err));
 		            });
 		        });
@@ -359,7 +362,7 @@ module.exports = (function() {
 		    console.log('Send transaction promise and event listener promise have completed');
 		    // check the results in the order the promises were added to the promise all list
 		    if (results && results[0] && results[0].status === 'SUCCESS') {
-		        console.log('Successfully sent transaction to the ohttp://localhost:8000/get_student/123rderer.');
+		        console.log('Successfully sent transaction to the orderer.');
 		        res.send(tx_id.getTransactionID());
 		    } else {
 		        console.error('Failed to order the transaction. Error code: ' + response.status);
