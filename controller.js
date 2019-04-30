@@ -222,7 +222,7 @@ module.exports = (function() {
 		console.log(req.body);
 		console.log(req);
 		console.log("submit recording of a cert catch: ");
-		var PRno = req.body['cert_PRno']
+		var PRno = req.body['cert_PRno']   //names as per form
 	    var CName = req.body['cert_CName']
 	    var Seatno = req.body['cert_Seatno']
 	    var examination = req.body['cert_examination']
@@ -440,7 +440,7 @@ module.exports = (function() {
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'securecert-app',
 		        fcn: 'addStudent',
-		        args: [PRno,password,FName,MName,LName,CName,branch,YOA,EId ,mobile  ],
+		        args: [PRno,password,Fname,Mname,Lname,CName,branch,YOA,Eid ,mobile],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -542,11 +542,12 @@ module.exports = (function() {
 		});
 	},
 
+	
 	Login: function(req, res){
 
 		var fabric_client = new Fabric_Client();
-		var pr = req.params.id1
-		var pwd =req.params.id2
+		var key1 = req.params.id2
+		var key2 = req.params.id2
 
 		// setup the fabric network
 		var channel = fabric_client.newChannel('mychannel');
@@ -585,7 +586,7 @@ module.exports = (function() {
 		        chaincodeId: 'securecert-app',
 		        txId: tx_id,
 		        fcn: 'login',
-		        args: [pr,pwd]
+		        args: [key1,key2]
 		    };
 
 		    // send the query proposal to the peer
@@ -596,7 +597,7 @@ module.exports = (function() {
 		    if (query_responses && query_responses.length == 1) {
 		        if (query_responses[0] instanceof Error) {
 		            console.error("error from query = ", query_responses[0]);
-		            res.send("Could not locate cert")
+		            res.send("Could not locate user")
 		            
 		        } else {
 		            console.log("Response is ", query_responses[0].toString());
@@ -604,11 +605,11 @@ module.exports = (function() {
 		        }
 		    } else {
 		        console.log("No payloads were returned from query");
-		        res.send("Could not locate cert")
+		        res.send("Could not locate user")
 		    }
 		}).catch((err) => {
 		    console.error('Failed to query successfully :: ' + err);
-		    res.send("Could not locate cert")
+		    res.send("Could not locate user")
 		});
 	},
 	transfer_cert: function(req, res){
