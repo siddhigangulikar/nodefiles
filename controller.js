@@ -277,7 +277,7 @@ module.exports = (function() {
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'securecert-app',
 		        fcn: 'addCert',
-		        args: [PRno,CName,Seatno,examination,YOP,sub ],
+		        args: [PRno,CName,Seatno,examination,YOP,sub],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -383,7 +383,7 @@ module.exports = (function() {
 		console.log(req.body);
 		console.log(req);
 		console.log("submit recording of a student: ");
-		/*var PRno = req.body['cert_PRno']
+		var PRno = req.body['cert_PRno']
 		var password = req.body['pwd']
 		var Fname = req.body['cert_Fname']
 		var Mname =req.body['cert_Mname']
@@ -392,18 +392,7 @@ module.exports = (function() {
 		var branch = req.body['branch']
 	    var YOA = req.body['cert_YOA']
 		var Eid = req.body['eid']
-		var mobile=req.body['mobile']*/
-
-		var PRno = '200'
-		var password = '200'
-		var Fname = 'abc'
-		var Mname ='def'
-		var Lname ='ghi'
-		var CName = 'jkl'
-		var branch = 'mno'
-	    var YOA = '2020'
-		var Eid = 'pqr@gmail.com'
-		var mobile='7788654'
+		var mobile=req.body['mobile']
 
 		var fabric_client = new Fabric_Client();
 
