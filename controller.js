@@ -383,7 +383,7 @@ module.exports = (function() {
 		console.log(req.body);
 		console.log(req);
 		console.log("submit recording of a student: ");
-		var PRno = req.body['cert_PRno']
+		/*var PRno = req.body['cert_PRno']
 		var password = req.body['pwd']
 		var Fname = req.body['cert_Fname']
 		var Mname =req.body['cert_Mname']
@@ -392,7 +392,18 @@ module.exports = (function() {
 		var branch = req.body['branch']
 	    var YOA = req.body['cert_YOA']
 		var Eid = req.body['eid']
-		var mobile=req.body['mobile']
+		var mobile=req.body['mobile']*/
+
+		var PRno = '200'
+		var password = '200'
+		var Fname = 'abc'
+		var Mname ='def'
+		var Lname ='ghi'
+		var CName = 'jkl'
+		var branch = 'mno'
+	    var YOA = '2020'
+		var Eid = 'pqr@gmail.com'
+		var mobile='7788654'
 
 		var fabric_client = new Fabric_Client();
 
@@ -500,8 +511,9 @@ module.exports = (function() {
 		                event_hub.unregisterTxEvent(transaction_id_string);
 		                event_hub.disconnect();
 
+						return Promise.all(promises);
 		                // now let the application know what happened
-		                var return_status = {event_status : code, tx_id : transaction_id_string};
+						var return_status = {event_status : code, tx_id : transaction_id_string};
 		                if (code !== 'VALID') {
 		                    console.error('The transaction was invalid, code = ' + code);
 		                    resolve(return_status); // we could use reject(new Error('Problem with the tranaction, event status ::'+code));
@@ -615,12 +627,11 @@ module.exports = (function() {
 	transfer_cert: function(req, res){
 		console.log("changing holder of cert : ");
 		console.log(req.params.certificate_id);
-
 		console.log(req.params.transferName);
 
 		
 		var keyy = req.params.certificate_id
-		var holderr = req.body.studentName
+		var holderr = req.body.transferName
 
 		var fabric_client = new Fabric_Client();
 
@@ -775,3 +786,4 @@ module.exports = (function() {
 
 }
 })();
+
