@@ -10,9 +10,9 @@ var path          = require('path');
 var util          = require('util');
 var os            = require('os');
 
-
 var uname = 'goauniversity' //university name
 var upassword = 'goauni'
+var role = 0
 var fabric_client = new Fabric_Client();
 
 // setup the fabric network
@@ -57,7 +57,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
         //targets : --- letting this default to the peers assigned to the channel
         chaincodeId: 'securecert-app',
         fcn: 'uniCredentials',
-        args: [uname,upassword],
+        args: [uname,upassword,role],
         chainId: 'mychannel',
         txId: tx_id
     };
