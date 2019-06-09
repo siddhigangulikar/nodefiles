@@ -12,6 +12,7 @@ var os            = require('os');
 
 var cuname = 'college' //creator name
 var cupassword = 'creator'
+var role = 1
 var fabric_client = new Fabric_Client();
 
 // setup the fabric network
@@ -56,7 +57,7 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
         //targets : --- letting this default to the peers assigned to the channel
         chaincodeId: 'securecert-app',
         fcn: 'creatorCredentials',
-        args: [cuname,cupassword],
+        args: [cuname,cupassword,role],
         chainId: 'mychannel',
         txId: tx_id
     };
@@ -155,4 +156,3 @@ Fabric_Client.newDefaultKeyValueStore({ path: store_path
 }).catch((err) => {
     console.error('Failed to invoke successfully :: ' + err);
 });
-
