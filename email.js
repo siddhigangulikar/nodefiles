@@ -1,3 +1,15 @@
+
+module.exports = (function() {
+	return{
+sendmail:function(FName,MName,LName,PRno,password,EId)
+{
+var nodemailer = require('nodemailer');
+var fname = FName;
+var mname =MName;
+var lname = LName;
+var uName = PRno;
+var pw = password;
+var mailId = EId;
 var htmlData="<style> \
 table, th, td { \
     width:40% ; \
@@ -11,7 +23,7 @@ th, td { \
 </style> \
 <body> \
  \
-<p>Dear "+fName+" "+ mName+" "+ lName+"  </p> \
+<p>Dear "+fname+" "+ mname+" "+ lname+"  </p> \
 Your Login details are given bellow, please login with the below credentials to view your certificates. \
 <br> \
 <table > \
@@ -39,7 +51,7 @@ Your Login details are given bellow, please login with the below credentials to 
    });
   const mailOptions = {
     from: 'underdogs15it@gmail.com', // sender address
-    to:EId, // list of receivers
+    to:mailId, // list of receivers
     subject: 'Student Enrollment Credentials', // Subject line
     html:   htmlData  // plain text body
   };
@@ -49,3 +61,6 @@ Your Login details are given bellow, please login with the below credentials to 
     else
       console.log(info);
  });
+}
+    }
+});
