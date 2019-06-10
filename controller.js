@@ -9,7 +9,8 @@ var Fabric_Client = require('fabric-client');
 var path          = require('path');
 var util          = require('util');
 var os            = require('os');
-
+//var mail=require('./email.js');
+var nodemailer = require('nodemailer');
 app.use(bodyParser.urlencoded({extended:true}));
 module.exports = (function() {
 	return{
@@ -219,24 +220,26 @@ module.exports = (function() {
 	},
 
 	addNewCertificate: function(req, res, next) {
-		//console.log(req.body);
+		console.log(req.body);
 		//console.log(req);
-		//console.log("submit recording of a cert catch: ");
+		console.log("submit recording of a cert catch: ");
 		var PRno = req.body['cert_PRno']
 	    var CName = req.body['cert_CName']
 	    var Seatno = req.body['cert_Seatno']
 	    var examination = req.body['cert_examination']
 	    var YOP = req.body['cert_YOP']
-		var sub = req.body['cert_sububject']
-		/*
-		var sub2 = req.body['cert_subject2']
-		var sub3 = req.body['cert_subject3']
-		var sub4 = req.body['cert_subject4']
-		var sub5 = req.body['cert_subject5']
-		var sub6 = req.body['cert_subject6']
-		*/ 
-	
+//		var sub = req.body['cert_subject']
+		var a=req.body['cert_subject'];
+		var b=req.body['cert_subject2'];
+		var c=req.body['cert_subject3'];
+		var d=req.body['cert_subject4'];
+		var e=req.body['cert_subject5'];
+		var f=req.body['cert_subject6'];
 
+		var sub={sub1:a,sub2:b,sub3:c,sub4:d,sub5:e,sub6:f};
+		var subjectObj=JSON.stringify(sub);
+
+		console.log(subjectObj);
 
 		var fabric_client = new Fabric_Client();
 
@@ -278,13 +281,13 @@ module.exports = (function() {
 		    tx_id = fabric_client.newTransactionID();
 		    console.log("Assigning transaction_id: ", tx_id._transaction_id);
 
-		    // addCert - requires 11 args, ["101","PCCE","101","nov/dec","2018","subject1mks","subject2mks","subject3mks","subject4mks","subject5mks","subject6mks"]}'
+		    // addCert - requires 5 args, ["101","PCCE","101","nov/dec","2018","abc"]}'
             // send proposal to endorser
 		    const request = {
 		        //targets : --- letting this default to the peers assigned to the channel
 		        chaincodeId: 'securecert-app',
 		        fcn: 'addCert',
-		        args: [PRno,CName,Seatno,examination,YOP,sub/*,sub2,sub3,sub4,sub5,sub6*/],
+		        args: [PRno,CName,Seatno,examination,YOP,subjectObj],
 		        chainId: 'mychannel',
 		        txId: tx_id
 		    };
@@ -307,7 +310,13 @@ module.exports = (function() {
 		        console.log(util.format(
 		            'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
 		            proposalResponses[0].response.status, proposalResponses[0].response.message));
-
+					/*console.log("KK");
+					if(proposalResponses[0].response.status==200)
+					{
+						res.status(200).send({sucess:true});
+					}
+					else{res.status(402).send({sucess:false});}
+					*/
 		        // build up the request for the orderer to have the transaction committed
 		        var request = {
 		            proposalResponses: proposalResponses,
@@ -362,7 +371,8 @@ module.exports = (function() {
 
 		        return Promise.all(promises);
 		    } else {
-		        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
+				//res.status(402).send({sucess:false});
+		        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
 		        throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
 		    }
 		}).then((results) => {
@@ -370,14 +380,14 @@ module.exports = (function() {
 		    // check the results in the order the promises were added to the promise all list
 		    if (results && results[0] && results[0].status === 'SUCCESS') {
 		        console.log('Successfully sent transaction to the orderer.');
-		        res.send(tx_id.getTransactionID());
+		        //res.send(tx_id.getTransactionID());
 		    } else {
 		        console.error('Failed to order the transaction. Error code: ' + response.status);
 		    }
 
 		    if(results && results[1] && results[1].event_status === 'VALID') {
 		        console.log('Successfully committed the change to the ledger by the peer');
-		        res.send(tx_id.getTransactionID());
+		        //res.send(tx_id.getTransactionID());
 		    } else {
 		        console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 		    }
@@ -386,18 +396,18 @@ module.exports = (function() {
 		});
 	},
 
-	addNewStudent: function(req, res, next) {
-		//console.log(req.body);
+	addNewStudent: function(req, res) {
+		console.log(req.body);
 		//console.log(req);
-		//console.log("submit recording of a student: ");
+		console.log("submit recording of a student: ");
 		var PRno = req.body['cert_PRno']
-		var password = req.body['password']
+		var password = req.body['cert_PRno']
 		var FName = req.body['firstName']
 		var MName =req.body['secondName']
 		var LName = req.body['surname']
 		var CName = req.body['collegeName']
 		var branch = req.body['branch']
-	        var YOA = req.body['YOA']
+	    var YOA = req.body['YOA']
 		var EId = req.body['emailId']
 		var mobile=req.body['mobileNumber']
 
@@ -470,7 +480,9 @@ module.exports = (function() {
 		        console.log(util.format(
 		            'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
 		            proposalResponses[0].response.status, proposalResponses[0].response.message));
-
+					//if(proposalResponses[0].response.status==200)
+					//{res.status(200).send({sucess:true});}
+					//else{res.status(402).send({sucess:false});}
 		        // build up the request for the orderer to have the transaction committed
 		        var request = {
 		            proposalResponses: proposalResponses,
@@ -515,6 +527,7 @@ module.exports = (function() {
 		                } else {
 		                    console.log('The transaction has been committed on peer ' + event_hub._ep._endpoint.addr);
 		                    resolve(return_status);
+				//res.send(return_status);
 		                }
 		            }, (err) => {
 		                //this is the callback if something goes wrong with the event registration or processing
@@ -525,36 +538,98 @@ module.exports = (function() {
 
 		        return Promise.all(promises);
 		    } else {
+				//res.status(402).send({sucess:false});
 		        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
-		        throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
-		    }
+				throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
+				
+			}
 		}).then((results) => {
-		    console.log('Send transaction promise and event listener promise have completed');
+			console.log('Send transaction promise and event listener promise have completed');
+			
 		    // check the results in the order the promises were added to the promise all list
 		    if (results && results[0] && results[0].status === 'SUCCESS') {
 		        console.log('Successfully sent transaction to the orderer.');
-		        res.send(tx_id.getTransactionID());
+		        //res.send(tx_id.getTransactionID());
 		    } else {
 		        console.error('Failed to order the transaction. Error code: ' + response.status);
 		    }
 
 		    if(results && results[1] && results[1].event_status === 'VALID') {
-		        console.log('Successfully committed the change to the ledger by the peer');
-		        res.send(tx_id.getTransactionID());
+				console.log('Successfully committed the change to the ledger by the peer');
+				var htmlData="<style> \
+table, th, td { \
+    width:40% ; \
+  border: 1px solid black; \
+  border-collapse: collapse; \
+} \
+th, td { \
+  padding: 5px; \
+  text-align: left;    \
+}  \
+</style> \
+<body> \
+ \
+<p>Dear "+FName+" "+ MName+" "+ LName+"  </p> \
+Your Login details are given bellow, please login with the below credentials to view your certificates. \
+<br> \
+<table > \
+<tr > \
+    <th >Student Information</th> \
+    </tr> \
+  <tr> \
+    <td>Login id:</td> \
+    <td>"+PRno+"</td> \
+  </tr> \
+  <tr> \
+    <td>Password:</td> \
+    <td>"+password+"</td> \
+  </tr> \
+</table> \
+ Regards SecureCert\
+</body>" 
+
+  var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+           user: 'underdogs15it@gmail.com',
+           pass: 'beitunderdogs'
+       }
+   });
+  const mailOptions = {
+    from: 'underdogs15it@gmail.com', // sender address
+    to:EId, // list of receivers
+    subject: 'Student Enrollment Credentials', // Subject line
+    html:   htmlData  // plain text body
+  };
+  transporter.sendMail(mailOptions, function (err, info) {
+    if(err)
+      console.log(err)
+    else
+      console.log(info);
+ });
+
+
+		        //res.send("success");
+			//console.log("GG");
+			//res.statusCode=200;
+		        //res.send(tx_id.getTransactionID());
+			//res.end();
 		    } else {
 		        console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 		    }
 		}).catch((err) => {
 		    console.error('Failed to invoke successfully :: ' + err);
 		});
+	
 	},
 
 	Login: function(req, res){
 
 		var fabric_client = new Fabric_Client();
-		var pr = req.body.id1
-		var pwd =req.body.id2
-		var role =req.body.id3
+		console.log(req.body);
+		var pr = req.body.username;
+		var pwd =req.body.password;
+		var role =req.body.role;
 
 		// setup the fabric network
 		var channel = fabric_client.newChannel('mychannel');
@@ -604,7 +679,7 @@ module.exports = (function() {
 		    if (query_responses && query_responses.length == 1) {
 		        if (query_responses[0] instanceof Error) {
 		            console.error("error from query = ", query_responses[0]);
-		            res.send("Could not locate student")
+		            res.send("Could not locate cert")
 		            
 		        } else {
 		            console.log("Response is ", query_responses[0].toString());
@@ -612,88 +687,16 @@ module.exports = (function() {
 		        }
 		    } else {
 		        console.log("No payloads were returned from query");
-		        res.send("Could not locate student")
+		        res.send("Could not locate cert")
 		    }
 		}).catch((err) => {
 		    console.error('Failed to query successfully :: ' + err);
-		    res.send("Could not locate student")
+		    res.send("Could not locate cert")
 		});
 	},
-
-/*
-	Login_university : function(req, res){
-
-		var fabric_client = new Fabric_Client();
-		var username = req.params.id3  //university details according to angular function call
-		var password =req.params.id4
-
-		// setup the fabric network
-		var channel = fabric_client.newChannel('mychannel');
-		var peer = fabric_client.newPeer('grpc://localhost:7051');
-		channel.addPeer(peer);
-
-		var member_user = null;
-		var store_path = path.join(os.homedir(), '.hfc-key-store');
-		console.log('Store path:'+store_path);
-		var tx_id = null;
-
-		// create the key value store as defined in the fabric-client/config/default.json 'key-value-store' setting
-		Fabric_Client.newDefaultKeyValueStore({ path: store_path
-		}).then((state_store) => {
-		    // assign the store to the fabric client
-		    fabric_client.setStateStore(state_store);
-		    var crypto_suite = Fabric_Client.newCryptoSuite();
-		    // use the same location for the state store (where the users' certificate are kept)
-		    // and the crypto store (where the users' keys are kept)
-		    var crypto_store = Fabric_Client.newCryptoKeyStore({path: store_path});
-		    crypto_suite.setCryptoKeyStore(crypto_store);
-		    fabric_client.setCryptoSuite(crypto_suite);
-
-		    // get the enrolled user from persistence, this user will sign all requests
-		    return fabric_client.getUserContext('user1', true);
-		}).then((user_from_store) => {
-		    if (user_from_store && user_from_store.isEnrolled()) {
-		        console.log('Successfully loaded user1 from persistence');
-		        member_user = user_from_store;
-		    } else {
-		        throw new Error('Failed to get user1.... run registerUser.js');
-		    }
-
-		    // readCert - requires 1 argument, ex: args: ['4'],
-		    const request = {
-		        chaincodeId: 'securecert-app',
-		        txId: tx_id,
-		        fcn: 'login',  //change as per chaincode
-		        args: [username,password]
-		    };
-
-		    // send the query proposal to the peer
-		    return channel.queryByChaincode(request);
-		}).then((query_responses) => {
-		    console.log("Query has completed, checking results");
-		    // query_responses could have more than one  results if there multiple peers were used as targets
-		    if (query_responses && query_responses.length == 1) {
-		        if (query_responses[0] instanceof Error) {
-		            console.error("error from query = ", query_responses[0]);
-		            res.send("Could not locate ")
-		            
-		        } else {
-		            console.log("Response is ", query_responses[0].toString());
-		            res.send(query_responses[0].toString())
-		        }
-		    } else {
-		        console.log("No payloads were returned from query");
-		        res.send("Could not locate ")
-		    }
-		}).catch((err) => {
-		    console.error('Failed to query successfully :: ' + err);
-		    res.send("Could not locate")
-		});
-	},*/
 	transfer_cert: function(req, res){
 		console.log("changing holder of cert : ");
 		console.log(req.params.certificate_id);
-
 		console.log(req.body.firstName);
 
 		
@@ -768,7 +771,10 @@ module.exports = (function() {
 		        console.log(util.format(
 		            'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
 		            proposalResponses[0].response.status, proposalResponses[0].response.message));
-
+					/*if(proposalResponses[0].response.status==200)
+					{res.status(200).send({sucess:true});}
+					else{res.status(402).send({sucess:false});}
+					*/
 		        // build up the request for the orderer to have the transaction committed
 		        var request = {
 		            proposalResponses: proposalResponses,
@@ -824,7 +830,8 @@ module.exports = (function() {
 		        return Promise.all(promises);
 		    } else {
 		        console.error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
-		        res.send("Error: no cert catch found");
+				res.send("Error: no cert catch found");
+				//res.status(402).send({sucess:false});
 		        // throw new Error('Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...');
 		    }
 		}).then((results) => {
@@ -832,7 +839,7 @@ module.exports = (function() {
 		    // check the results in the order the promises were added to the promise all list
 		    if (results && results[0] && results[0].status === 'SUCCESS') {
 		        console.log('Successfully sent transaction to the orderer.');
-		        res.json(tx_id.getTransactionID())
+		        //res.json(tx_id.getTransactionID())
 		    } else {
 		        console.error('Failed to order the transaction. Error code: ' + response.status);
 		        res.send("Error: no cert catch found");
@@ -840,7 +847,7 @@ module.exports = (function() {
 
 		    if(results && results[1] && results[1].event_status === 'VALID') {
 		        console.log('Successfully committed the change to the ledger by the peer');
-				res.send(tx_id.getTransactionID())
+				//res.send(tx_id.getTransactionID())
 		    } else {
 		        console.log('Transaction failed to be committed to the ledger due to ::'+results[1].event_status);
 		    }
@@ -848,8 +855,6 @@ module.exports = (function() {
 		    console.error('Failed to invoke successfully :: ' + err);
 		    ///res.send("Error: no cert catch found");
 		});
-
 	}
-
 }
 })();
